@@ -9,8 +9,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# copy project files (including prefect.yaml)
 COPY app ./app
 COPY entrypoint.sh ./entrypoint.sh
+COPY prefect.yaml ./prefect.yaml
+COPY soda ./soda
+COPY scripts ./scripts
+
 RUN chmod +x /app/entrypoint.sh
 
 CMD ["/app/entrypoint.sh"]

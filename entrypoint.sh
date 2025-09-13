@@ -14,6 +14,9 @@ WORK_POOL="${WORK_POOL:-default}"
 WORKER_NAME="${WORKER_NAME:-app-worker}"
 PREFECT_LOGGING_LEVEL="${PREFECT_LOGGING_LEVEL:-INFO}"
 
+# Auto-deploy toggle (1 = deploy no start se existir /app/prefect.yaml)
+AUTO_DEPLOY="${AUTO_DEPLOY:-1}"
+
 trap 'echo "[entrypoint] Signal received, stopping..."; [[ -n "${SERVER_PID:-}" ]] && kill -TERM "$SERVER_PID" 2>/dev/null || true; exit 0' TERM INT
 
 echo "[entrypoint] Waiting for MinIO at ${MINIO_HEALTH_URL}..."
@@ -51,6 +54,17 @@ echo "[entrypoint] PREFECT_API_URL=${PREFECT_API_URL}"
 echo "[entrypoint] Ensuring work pool '${WORK_POOL}' (type=process)..."
 prefect work-pool create "${WORK_POOL}" -t process >/dev/null 2>&1 || true
 
+# ---- AUTO DEPLOY ----
+if [ "${AUTO_DEPLOY}" = "1" ] && [ -f /app/prefect.yaml ]; then
+  echo "[entrypoint] Running 'prefect deploy' to register deployments..."
+  # dont't failed if exists
+  prefect deploy || true
+  echo "[entrypoint] Deployments registered:"
+  prefect deployments ls || true
+else
+  echo "[entrypoint] AUTO_DEPLOY disabled or /app/prefect.yaml not found; skipping deploy."
+fi
+
 echo "[entrypoint] Starting Prefect Worker on pool='${WORK_POOL}' name='${WORKER_NAME}'..."
-# Run worker in foreground to keep the container alive
+# Worker in background
 prefect worker start -p "${WORK_POOL}" -n "${WORKER_NAME}"

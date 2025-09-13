@@ -1,12 +1,10 @@
 version: 3
+
 deployments:
   - name: breweries-medallion-dev
     entrypoint: app/pipeline.py:run
     work_pool:
       name: default
-    tags: [dev, breweries]
     parameters:
       ingestion_date: null
-    schedules:
-      - interval:
-          interval: 900  # seconds (15 min)
+    tags: [dev, breweries]
