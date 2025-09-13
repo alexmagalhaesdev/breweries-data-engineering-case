@@ -1,0 +1,19 @@
+checks for silver_breweries:
+  - row_count > 0
+  - schema:
+      warn:
+        when schema changes:
+          add columns: any
+          remove columns: none
+      columns:
+        id: text
+        name: text
+        brewery_type: text
+        country: text
+        state: text
+        city: text
+        postal_code: text
+        latitude: number
+        longitude: number
+  - missing_count(id) = 0
+  - duplicate_count(id) = 0

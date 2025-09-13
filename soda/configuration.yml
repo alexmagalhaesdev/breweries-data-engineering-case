@@ -1,0 +1,5 @@
+data_source duckdb:
+  type: duckdb
+  database: /data/warehouse.duckdb
+  scan:
+    schema_inference: true

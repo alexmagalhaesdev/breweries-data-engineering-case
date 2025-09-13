@@ -1,0 +1,3 @@
+checks for gold_breweries_counts:
+  - row_count > 0
+  - max(brewery_count) > 0
