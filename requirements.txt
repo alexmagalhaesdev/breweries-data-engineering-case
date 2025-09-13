@@ -1,0 +1,9 @@
+prefect==3.4.18
+pydantic==2.11.9
+s3fs==2025.9.0
+fsspec==2025.9.0
+boto3==1.40.0
+duckdb==1.3.2
+pyarrow==21.0.0
+requests==2.32.5
+pytest==8.4.2
