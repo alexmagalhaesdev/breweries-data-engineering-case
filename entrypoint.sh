@@ -14,7 +14,7 @@ WORK_POOL="${WORK_POOL:-default}"
 WORKER_NAME="${WORKER_NAME:-app-worker}"
 PREFECT_LOGGING_LEVEL="${PREFECT_LOGGING_LEVEL:-INFO}"
 
-# Auto-deploy toggle (1 = deploy no start se existir /app/prefect.yaml)
+# Auto-deploy toggle (1 = deploy no start if exists /app/prefect.yaml)
 AUTO_DEPLOY="${AUTO_DEPLOY:-1}"
 
 trap 'echo "[entrypoint] Signal received, stopping..."; [[ -n "${SERVER_PID:-}" ]] && kill -TERM "$SERVER_PID" 2>/dev/null || true; exit 0' TERM INT

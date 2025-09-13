@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: build up down logs test scan fmt
+.PHONY: build up down logs test scan fmt fmt-check
 
 build:
 	docker compose build
@@ -21,4 +21,7 @@ scan:
 	docker compose run --rm app bash -lc "soda scan -d duckdb -c soda/configuration.yml soda/checks/silver_breweries.yml"
 
 fmt:
-	docker compose run --rm app bash -lc "python -m pip install ruff && ruff check --fix app"
+	docker compose run --rm app bash -lc "python -m pip install -q ruff black && black app tests && ruff check --fix app tests"
+
+fmt-check:
+	docker compose run --rm app bash -lc "python -m pip install -q ruff black && black --check app tests && ruff check app tests"
