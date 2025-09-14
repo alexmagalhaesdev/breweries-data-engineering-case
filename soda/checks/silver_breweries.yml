@@ -1,0 +1,11 @@
+# soda/checks/silver_breweries.yml
+checks:
+  - name: silver_row_count
+    dataset: silver_breweries
+    sql: SELECT COUNT(*) as cnt FROM silver_breweries
+    assertions:
+      - cnt > 0
+
+datasets:
+  silver_breweries:
+    path: "{{ env('DUCKDB_PATH', '/data/warehouse.duckdb') }}"

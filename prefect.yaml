@@ -1,0 +1,13 @@
+version: 3
+name: breweries-medallion
+prefect-version: ">=3.4.0"
+
+deployments:
+  - name: breweries-medallion-deploy
+    entrypoint: app/pipeline.py:run
+    work_pool:
+      name: default
+    parameters:
+      ingestion_date: null              
+    tags: [dev, breweries]
+    schedules: []                        # manual

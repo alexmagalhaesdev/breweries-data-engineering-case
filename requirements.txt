@@ -1,0 +1,17 @@
+# Orchestration
+prefect==3.4.18
+pydantic==2.11.9
+
+# Storage / S3-compatible
+boto3==1.40.0
+
+# Columnar / compute
+duckdb==1.0.0
+pyarrow==21.0.0
+
+# Data quality & unit tests
+soda-core-duckdb==3.5.5
+pytest==8.4.2
+
+# HTTP utils
+requests==2.32.5

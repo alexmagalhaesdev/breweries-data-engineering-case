@@ -1,0 +1,7 @@
+# soda/configuration.yml
+data_source: duckdb
+
+data_sources:
+  duckdb:
+    type: duckdb
+    path: "{{ env('DUCKDB_PATH', '/data/warehouse.duckdb') }}"
