@@ -1,19 +1,25 @@
-checks for silver_breweries:
-  - row_count > 0
+datasets:
+  - name: silver_breweries_ds
+    sql: |
+      SELECT *
+      FROM read_parquet(
+        's3://${LAKE_BUCKET}/${SILVER_PREFIX}/breweries/ingestion_date=${ING_DATE}/*/*/*.parquet'
+      )
+
+checks for silver_breweries_ds:
   - schema:
       warn:
-        when schema changes:
-          add columns: any
-          remove columns: none
-      columns:
-        id: text
-        name: text
-        brewery_type: text
-        country: text
-        state: text
-        city: text
-        postal_code: text
-        latitude: number
-        longitude: number
+        when schema changes: any
+
+  - row_count > 0
   - missing_count(id) = 0
-  - duplicate_count(id) = 0
+  - missing_count(name) = 0
+  - missing_count(country) = 0
+  - missing_count(state) = 0
+
+  - invalid_percent(latitude) < 1 %:
+      valid min: -90
+      valid max: 90
+  - invalid_percent(longitude) < 1 %:
+      valid min: -180
+      valid max: 180

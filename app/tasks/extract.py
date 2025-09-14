@@ -75,3 +75,6 @@ def ingest_bronze(ing_date: str) -> Tuple[int, int]:
 
     log.info(f"[bronze] done pages={pages_written} records={records_written}")
     return pages_written, records_written
+
+# Re-export for unit tests
+parse_last_page = _parse_last_page

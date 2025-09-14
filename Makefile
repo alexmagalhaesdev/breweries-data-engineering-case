@@ -15,10 +15,10 @@ logs:
 	docker compose logs -f app
 
 test:
-	docker compose run --rm app pytest -q
+	docker compose run --rm -e PYTHONPATH=/app app pytest -q
 
 scan:
-	docker compose run --rm app bash -lc "soda scan -d duckdb -c soda/configuration.yml soda/checks/silver_breweries.yml"
+	docker compose run --rm app bash -lc "python -m pip install -q 'setuptools==68.2.2' && soda scan -d duckdb -c soda/configuration.yml soda/checks/silver_breweries.yml"
 
 fmt:
 	docker compose run --rm app bash -lc "python -m pip install -q ruff black && black app tests && ruff check --fix app tests"

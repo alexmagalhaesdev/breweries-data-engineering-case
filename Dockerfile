@@ -15,6 +15,7 @@ COPY entrypoint.sh ./entrypoint.sh
 COPY prefect.yaml ./prefect.yaml
 COPY soda ./soda
 COPY scripts ./scripts
+COPY tests ./tests
 
 RUN chmod +x /app/entrypoint.sh
 
