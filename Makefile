@@ -18,7 +18,12 @@ test:
 	docker compose run --rm -e PYTHONPATH=/app app pytest -q
 
 scan:
-	docker compose run --rm app bash -lc "python -m pip install -q 'setuptools==68.2.2' && soda scan -d duckdb -c soda/configuration.yml soda/checks/silver_breweries.yml"
+	docker compose run --rm -e DUCKDB_PATH="$(DUCKDB_PATH)" app bash -lc "\
+		apt-get update >/dev/null && \
+		apt-get install -y python3-setuptools python3-distutils || true && \
+		python3 -m pip install --upgrade pip setuptools wheel >/dev/null && \
+		soda scan -d duckdb -c soda/configuration.yml soda/checks/silver_breweries.yml\
+	"
 
 fmt:
 	docker compose run --rm app bash -lc "python -m pip install -q ruff black && black app tests && ruff check --fix app tests"

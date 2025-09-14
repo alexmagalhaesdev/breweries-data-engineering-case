@@ -1,5 +1,7 @@
-data_source duckdb:
-  type: duckdb
-  database: /data/warehouse.duckdb
-  scan:
-    schema_inference: true
+# soda/configuration.yml
+data_source: duckdb
+
+data_sources:
+  duckdb:
+    type: duckdb
+    path: "{{ env('DUCKDB_PATH', '/data/warehouse.duckdb') }}"
