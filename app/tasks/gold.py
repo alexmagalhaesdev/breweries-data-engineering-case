@@ -76,7 +76,7 @@ def aggregate_gold(ing_date: str) -> str:
         TO '{base_dir}/by_country_state_type'
         (
           FORMAT PARQUET,
-          PARTITION_BY (country, state),
+          PARTITION_BY (country, state, brewery_type),
           FILENAME_PATTERN '{{uuid}}',
           COMPRESSION 'snappy',
           OVERWRITE_OR_IGNORE TRUE
@@ -97,7 +97,7 @@ def aggregate_gold(ing_date: str) -> str:
         TO '{base_dir}/by_country_type'
         (
           FORMAT PARQUET,
-          PARTITION_BY (country),
+          PARTITION_BY (country, brewery_type),
           FILENAME_PATTERN '{{uuid}}',
           COMPRESSION 'snappy',
           OVERWRITE_OR_IGNORE TRUE
@@ -118,7 +118,7 @@ def aggregate_gold(ing_date: str) -> str:
         TO '{base_dir}/by_state_type'
         (
           FORMAT PARQUET,
-          PARTITION_BY (state),
+          PARTITION_BY (state, brewery_type),
           FILENAME_PATTERN '{{uuid}}',
           COMPRESSION 'snappy',
           OVERWRITE_OR_IGNORE TRUE
@@ -126,7 +126,7 @@ def aggregate_gold(ing_date: str) -> str:
         """
     )
 
-    # 4) type (global)
+    # 4) type
     con.execute(
         f"""
         COPY (
@@ -139,6 +139,7 @@ def aggregate_gold(ing_date: str) -> str:
         TO '{base_dir}/by_type'
         (
           FORMAT PARQUET,
+          PARTITION_BY (brewery_type),
           FILENAME_PATTERN '{{uuid}}',
           COMPRESSION 'snappy',
           OVERWRITE_OR_IGNORE TRUE
