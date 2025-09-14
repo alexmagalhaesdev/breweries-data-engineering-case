@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: build up down logs test scan fmt fmt-check
+.PHONY: build up down logs test scan fmt fmt-check duckcli
 
 build:
 	docker compose build
@@ -25,3 +25,11 @@ fmt:
 
 fmt-check:
 	docker compose run --rm app bash -lc "python -m pip install -q ruff black && black --check app tests && ruff check app tests"
+
+duckcli:
+	@command -v duckdb >/dev/null 2>&1 || { \
+		echo "DuckDB CLI not found. Please install it following this documentation: https://motherduck.com/docs/getting-started/interfaces/connect-query-from-duckdb-cli/"; \
+		exit 1; \
+	}
+	docker compose cp app:/data/warehouse.duckdb ./warehouse.duckdb
+	duckdb ./warehouse.duckdb

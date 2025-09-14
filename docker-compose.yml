@@ -6,25 +6,30 @@ services:
       MINIO_ROOT_USER: ${AWS_ACCESS_KEY_ID}
       MINIO_ROOT_PASSWORD: ${AWS_SECRET_ACCESS_KEY}
     ports:
-      - "9000:9000"   # S3 API
+      - "9000:9000"   # S3-compatible API
       - "9001:9001"   # MinIO Console
     volumes:
       - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/ready"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
 
   app:
     build: .
     depends_on:
-      - minio
+      minio:
+        condition: service_healthy
     environment:
-      # S3 / MinIO
       S3_ENDPOINT_URL: http://minio:9000
-      AWS_ACCESS_KEY_ID: minio
-      AWS_SECRET_ACCESS_KEY: minio12345
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       AWS_DEFAULT_REGION: us-east-1
-      BRONZE_BUCKET: lake-bronze
-      SILVER_BUCKET: lake-silver
-      GOLD_BUCKET: lake-gold
-      # Prefect always-on (Server + Worker)
+      LAKE_BUCKET: breweries-data-lake
+      LAYER_PREFIX_BRONZE: bronze-layer
+      LAYER_PREFIX_SILVER: silver-layer
+      LAYER_PREFIX_GOLD:   gold-layer
       PREFECT_HOST: 0.0.0.0
       PREFECT_PORT: "4200"
       WORK_POOL: default
@@ -32,6 +37,9 @@ services:
       PREFECT_LOGGING_LEVEL: INFO
     ports:
       - "4200:4200"   # Prefect UI
+    volumes:
+      - duckdb_data:/data  # Persist DuckDB (final local table / cache)
 
 volumes:
   minio_data:
+  duckdb_data:

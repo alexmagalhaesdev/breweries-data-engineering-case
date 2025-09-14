@@ -26,7 +26,7 @@ def _parse_last_page(link_header: Optional[str]) -> Optional[int]:
 
 
 @task(name="fetch_first_page_metadata", retries=2, retry_delay_seconds=5)
-def fetch_first_page_metadata() -> Tuple[List[Dict], Optional[int]]:
+def fetch_first_page_metadata() -> Tuple[List[Dict], int]:
     r = requests.get(
         SETTINGS.api_url,
         params={"per_page": SETTINGS.per_page, "page": 1},
@@ -34,7 +34,7 @@ def fetch_first_page_metadata() -> Tuple[List[Dict], Optional[int]]:
         timeout=30,
     )
     r.raise_for_status()
-    last = _parse_last_page(r.headers.get("Link"))
+    last = _parse_last_page(r.headers.get("Link")) or 1
     return r.json(), last
 
 
@@ -53,8 +53,8 @@ def fetch_page(page: int) -> List[Dict]:
 @task(name="persist_bronze")
 def persist_bronze(records: List[Dict], page: int, ing_date: str) -> str:
     key = bronze_key(ing_date, page)
-    return put_json(SETTINGS.bronze_bucket, key, records)
+    return put_json(key, records)
 
 
-# re-export for tests
+# Re-export for tests
 parse_last_page = _parse_last_page
