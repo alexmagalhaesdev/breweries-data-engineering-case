@@ -1,8 +1,9 @@
+# app/tasks/extract.py
 import re
-from typing import Optional, Tuple, List, Dict
+from typing import Optional, List, Dict, Tuple
 
 import requests
-from prefect import task
+from prefect import task, get_run_logger
 
 from app.config import SETTINGS
 from app.io.storage import bronze_key, put_json
@@ -25,36 +26,52 @@ def _parse_last_page(link_header: Optional[str]) -> Optional[int]:
     return None
 
 
-@task(name="fetch_first_page_metadata", retries=2, retry_delay_seconds=5)
-def fetch_first_page_metadata() -> Tuple[List[Dict], int]:
-    r = requests.get(
-        SETTINGS.api_url,
-        params={"per_page": SETTINGS.per_page, "page": 1},
-        headers=HEADERS,
-        timeout=30,
-    )
+@task(name="ingest_bronze", retries=2, retry_delay_seconds=5)
+def ingest_bronze(ing_date: str) -> Tuple[int, int]:
+    """
+    Single task that fetches ALL pages and writes each page to Bronze as JSON.
+    Returns (pages_written, records_written).
+    """
+    log = get_run_logger()
+    per_page = SETTINGS.per_page
+    url = SETTINGS.api_url
+    max_pages_cap = 10000
+
+    # Page 1 + try to discover 'last' via Link header
+    r = requests.get(url, params={"per_page": per_page, "page": 1}, headers=HEADERS, timeout=30)
     r.raise_for_status()
-    last = _parse_last_page(r.headers.get("Link")) or 1
-    return r.json(), last
+    first_page = r.json()
+    last = _parse_last_page(r.headers.get("Link"))
+    put_json(bronze_key(ing_date, 1), first_page)
 
+    pages_written = 1
+    records_written = len(first_page)
+    log.info(f"[bronze] page=1 size={len(first_page)} last={last}")
 
-@task(name="fetch_page", retries=2, retry_delay_seconds=5)
-def fetch_page(page: int) -> List[Dict]:
-    r = requests.get(
-        SETTINGS.api_url,
-        params={"per_page": SETTINGS.per_page, "page": page},
-        headers=HEADERS,
-        timeout=30,
-    )
-    r.raise_for_status()
-    return r.json()
+    if isinstance(last, int) and last >= 2:
+        # Deterministic range when 'last' is present
+        for p in range(2, min(last, max_pages_cap) + 1):
+            r = requests.get(url, params={"per_page": per_page, "page": p}, headers=HEADERS, timeout=30)
+            r.raise_for_status()
+            data = r.json()
+            if not data:
+                break
+            put_json(bronze_key(ing_date, p), data)
+            pages_written += 1
+            records_written += len(data)
+    else:
+        # Fallback: stop when the page size drops below per_page (or empty)
+        for p in range(2, max_pages_cap + 1):
+            r = requests.get(url, params={"per_page": per_page, "page": p}, headers=HEADERS, timeout=30)
+            r.raise_for_status()
+            data = r.json()
+            if not data:
+                break
+            put_json(bronze_key(ing_date, p), data)
+            pages_written += 1
+            records_written += len(data)
+            if len(data) < per_page:
+                break
 
-
-@task(name="persist_bronze")
-def persist_bronze(records: List[Dict], page: int, ing_date: str) -> str:
-    key = bronze_key(ing_date, page)
-    return put_json(key, records)
-
-
-# Re-export for tests
-parse_last_page = _parse_last_page
+    log.info(f"[bronze] done pages={pages_written} records={records_written}")
+    return pages_written, records_written
