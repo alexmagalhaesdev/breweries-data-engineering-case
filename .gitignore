@@ -3,6 +3,10 @@ __pycache__/
 *.py[codz]
 *$py.class
 
+# Avoid .duckdb files
+*.duckdb
+*.duckdb-wal
+
 # C extensions
 *.so
 
