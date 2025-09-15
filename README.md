@@ -2,13 +2,50 @@
 
 End-to-end **medallion** pipeline for the Open Brewery DB: **Bronze → Silver → Gold** on S3-compatible storage (**MinIO**), orchestrated with **Prefect 3**, transformed with **DuckDB** (reading/writing directly to S3), **data quality with Soda Core**, and fully containerized with Docker.
 
+## Requirements
+
+To run the project end-to-end, have these installed:
+
+* **Git** – to clone this repository.
+* **Make** – to run the convenience targets (`make build`, `make up`, etc.).
+  Linux: `sudo apt install make` · Windows: WSL/Chocolatey (`choco install make`) or Scoop (`scoop install make`) · macOS: Xcode Command Line Tools.
+* **Docker** – mandatory runtime. **Docker Desktop** recommended.
+* **DuckDB CLI** (optional) – to explore `/data/warehouse.duckdb` locally; data is also queryable directly from MinIO.
+
+<p align="center">
+  <img src="images/image-1.png" alt="Duckdb using duck cli to explore my data" width="800"
+       style="border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.08)">
+</p>
+
+> **Note – Prefect deployment link**: when you bring the stack up (`make up`), Prefect registers the deployment and logs a **deployment URL**. Copy that link, paste it in your browser, open the deployment page, and click **Run** to trigger the pipeline.
+
+<p align="center">
+  <img src="images/image.png" alt="Deploy prefect pipeline" width="800"
+      style="border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.08)">
+</p>
+
 ## Architecture overview
 
 * **Orchestration – Prefect 3**
   Always-on Prefect **Server + Worker**. A deployment is registered at container start; runs are triggered **manually** via UI or CLI.
+  
+<p align="center">
+  <img src="images/image-2.png" alt="pipeline execution" width="800"
+      style="border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.08)">
+</p>
 
 * **Storage – MinIO (data lake, S3-compatible)**
   An easy way to run **S3-compatible storage locally** and act as a **data lake**. Object paths mirror what you would later use on **AWS S3**, so migration is a config change (endpoint/credentials), not a code rewrite.
+
+<p align="center">
+  <img src="images/image-3.png" alt="data lake layers" width="800"
+      style="border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.08)">
+</p>
+
+<p align="center">
+  <img src="images/image-4.png" alt="data lake partition layers" width="800"
+      style="border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.08)">
+</p>
 
 * **Compute/Transform – DuckDB**
   In-process analytical engine with **native S3 I/O**. We read Bronze JSON and Silver Parquet directly from S3 and write Parquet back to S3 using `COPY ... TO 's3://...'`.
@@ -266,6 +303,4 @@ docker compose exec app python -c "from app.pipeline import run; run(ingestion_d
   Check inside the container: `docker compose exec app prefect deployments ls`.
 * **Worker not pulling runs**: UI → **Work Pools → default** should show `app-worker` as healthy/connected.
 * **UI port conflict**: change `PREFECT_PORT` in `docker-compose.yml`, rebuild, and restart.
-* **Version pinning**: if `soda-core-duckdb` lags behind a newer DuckDB, align their versions.
-
----
+* **Version pinning**: if `soda-core-duckdb` lags behind a newer DuckDB, align the
