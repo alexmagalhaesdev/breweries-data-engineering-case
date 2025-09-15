@@ -304,3 +304,35 @@ docker compose exec app python -c "from app.pipeline import run; run(ingestion_d
 * **Worker not pulling runs**: UI → **Work Pools → default** should show `app-worker` as healthy/connected.
 * **UI port conflict**: change `PREFECT_PORT` in `docker-compose.yml`, rebuild, and restart.
 * **Version pinning**: if `soda-core-duckdb` lags behind a newer DuckDB, align the
+  
+## Possible Improvements
+
+Although the pipeline is functional end-to-end, there are several areas where it can be extended to make it more production-ready:
+
+### 1. Data Quality Coverage
+
+* Ensure that **data quality checks** are not only executed but **validated end-to-end** across all layers (Bronze → Silver → Gold).
+* Expand the **coverage of Soda Core tests**, adding more assertions on schema, nullability, reference integrity, and distribution metrics.
+* Add **unit tests** to increase code-level coverage (e.g., testing pagination, schema normalization, and transformation edge cases).
+
+### 2. Alerts and Notifications
+
+* Integrate Prefect pipeline with **alerting channels** (Teams, Slack, Email).
+  Example: trigger a notification whenever a task fails or a data quality scan raises warnings/errors.
+* This ensures quick feedback loops and faster incident response.
+
+### 3. Scheduling and Automation
+
+* Configure Prefect deployments with a **periodic schedule** (daily/weekly) instead of manual triggers.
+* This would allow continuous ingestion and transformation without manual intervention.
+* Combined with alerts, scheduling makes the pipeline closer to a production-grade data platform.
+
+### 4. Observability & Monitoring
+
+* Add metrics export (e.g., to Prometheus/Grafana) for pipeline runtime, task duration, and error counts.
+* Extend logging with structured JSON logs to improve searchability and traceability.
+
+---
+
+**Summary:** Next steps should focus on **reliability (alerts, monitoring)** and **coverage (tests, quality checks)**. These improvements will turn the demo pipeline into a resilient foundation for production workloads.
+
