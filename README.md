@@ -305,33 +305,28 @@ docker compose exec app python -c "from app.pipeline import run; run(ingestion_d
 * **UI port conflict**: change `PREFECT_PORT` in `docker-compose.yml`, rebuild, and restart.
 * **Version pinning**: if `soda-core-duckdb` lags behind a newer DuckDB, align the
   
-> ## Possible Improvements
+> \[!IMPORTANT] **Possible Improvements**
+> **Goal:** make the pipeline more production-ready while keeping it simple.
 >
-> Although the pipeline is functional end-to-end, there are several areas where it can be extended to make it more production-ready:
+> \[!CHECKLIST] **Data Quality – end-to-end coverage**
 >
-> ### 1. Data Quality Coverage
+> * Ensure that **checks** are executed and **validated** across **Bronze → Silver → Gold**.
+> * Expand **Soda Core checks** (schema, nullability, reference integrity, distribution metrics).
+> * Add more **unit tests** for pagination, schema normalization, and transformation edge cases.
 >
-> * Ensure that **data quality checks** are not only executed but **validated end-to-end** across all layers (Bronze → Silver → Gold).
-> * Expand the **coverage of Soda Core tests**, adding more assertions on schema, nullability, reference integrity, and distribution metrics.
-> * Add **unit tests** to increase code-level coverage (e.g., testing pagination, schema normalization, and transformation edge cases).
+> \[!WARNING] **Alerts and incidents**
 >
-> ### 2. Alerts and Notifications
+> * Integrate **Prefect** with **Teams / Slack / Email** to notify on **task failures** and **data quality errors/warnings**.
+> * Send minimal payload (flow, task, run\_id, exception, run link) for quick response.
 >
-> * Integrate Prefect pipeline with **alerting channels** (Teams, Slack, Email).
->   Example: trigger a notification whenever a task fails or a data quality scan raises warnings/errors.
-> * This ensures quick feedback loops and faster incident response.
+> \[!TIP] **Scheduling**
 >
-> ### 3. Scheduling and Automation
+> * Configure **Prefect schedules** (daily/weekly) instead of manual triggers.
+> * Combine with alerts for continuous operation without intervention.
 >
-> * Configure Prefect deployments with a **periodic schedule** (daily/weekly) instead of manual triggers.
-> * This would allow continuous ingestion and transformation without manual intervention.
-> * Combined with alerts, scheduling makes the pipeline closer to a production-grade data platform.
+> \[!NOTE] **Observability**
 >
-> ### 4. Observability & Monitoring
+> * Export metrics (runtime, task duration, error counts) to **Prometheus/Grafana**.
+> * Use structured logging (JSON) for easier search and correlation.
 >
-> * Add metrics export (e.g., to Prometheus/Grafana) for pipeline runtime, task duration, and error counts.
-> * Extend logging with structured JSON logs to improve searchability and traceability.
->
-> ---
->
-> **Summary:** Next steps should focus on **reliability (alerts, monitoring)** and **coverage (tests, quality checks)**. These improvements will turn the demo pipeline into a resilient foundation for production workloads.
+> **Summary:** Focus on **reliability** (alerts/observability) and **coverage** (checks + tests). These improvements will bring the demo pipeline closer to production-grade quality.
