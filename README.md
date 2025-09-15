@@ -17,13 +17,6 @@ To run the project end-to-end, have these installed:
        style="border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.08)">
 </p>
 
-> **Note – Prefect deployment link**: when you bring the stack up (`make up`), Prefect registers the deployment and logs a **deployment URL**. Copy that link, paste it in your browser, open the deployment page, and click **Run** to trigger the pipeline.
-
-<p align="center">
-  <img src="images/image.png" alt="Deploy prefect pipeline" width="800"
-      style="border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.08)">
-</p>
-
 ## Architecture overview
 
 * **Orchestration – Prefect 3**
@@ -31,6 +24,13 @@ To run the project end-to-end, have these installed:
   
 <p align="center">
   <img src="images/image-2.png" alt="pipeline execution" width="800"
+      style="border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.08)">
+</p>
+
+> **Note – Prefect deployment link**: when you bring the stack up (`make up`), Prefect registers the deployment and logs a **deployment URL**. Copy that link, paste it in your browser, open the deployment page, and click **Run** to trigger the pipeline.
+
+<p align="center">
+  <img src="images/image.png" alt="Deploy prefect pipeline" width="800"
       style="border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.08)">
 </p>
 
