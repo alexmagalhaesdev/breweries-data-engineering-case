@@ -305,28 +305,28 @@ docker compose exec app python -c "from app.pipeline import run; run(ingestion_d
 * **UI port conflict**: change `PREFECT_PORT` in `docker-compose.yml`, rebuild, and restart.
 * **Version pinning**: if `soda-core-duckdb` lags behind a newer DuckDB, align the
   
-> \[!IMPORTANT] **Possible Improvements**
-> **Goal:** make the pipeline more production-ready while keeping it simple.
->
-> \[!CHECKLIST] **Data Quality – end-to-end coverage**
->
-> * Ensure that **checks** are executed and **validated** across **Bronze → Silver → Gold**.
-> * Expand **Soda Core checks** (schema, nullability, reference integrity, distribution metrics).
-> * Add more **unit tests** for pagination, schema normalization, and transformation edge cases.
->
-> \[!WARNING] **Alerts and incidents**
->
-> * Integrate **Prefect** with **Teams / Slack / Email** to notify on **task failures** and **data quality errors/warnings**.
-> * Send minimal payload (flow, task, run\_id, exception, run link) for quick response.
->
-> \[!TIP] **Scheduling**
->
-> * Configure **Prefect schedules** (daily/weekly) instead of manual triggers.
-> * Combine with alerts for continuous operation without intervention.
->
-> \[!NOTE] **Observability**
->
-> * Export metrics (runtime, task duration, error counts) to **Prometheus/Grafana**.
-> * Use structured logging (JSON) for easier search and correlation.
->
-> **Summary:** Focus on **reliability** (alerts/observability) and **coverage** (checks + tests). These improvements will bring the demo pipeline closer to production-grade quality.
+## 🚀 Possible Improvements
+
+> Goal: Make the pipeline more production-ready while keeping it simple.
+
+✅ Data Quality – End-to-End Coverage
+
+* Ensure that data quality checks are executed and validated across Bronze → Silver → Gold layers.
+* Expand Soda Core checks (schema, nullability, reference integrity, distribution metrics).
+* Add more unit tests for pagination, schema normalization, and transformation edge cases.
+
+⚠️ Alerts and Notifications
+
+* Integrate Prefect with Teams / Slack / Email to notify on task failures and data quality errors/warnings.
+* Send minimal payload (flow, task, run_id, exception, run link) for quick response.
+
+⏰ Scheduling
+
+* Configure Prefect schedules (daily/weekly) instead of manual triggers.
+* Combine with alerts for continuous operation without intervention.
+
+📊 Observability & Monitoring
+
+* Export metrics (runtime, task duration, error counts) to Prometheus/Grafana.
+* Use structured logging (JSON) for easier search and correlation.
+* Summary: Focus on reliability (alerts/observability) and coverage (checks + tests). These improvements will bring the demo pipeline closer to production-grade quality.
